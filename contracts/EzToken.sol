@@ -1,15 +1,35 @@
-pragma solidity ^0.4.16;
+pragma solidity ^0.4.2;
 
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
+
 
 contract EZToken {
     // Public variables of the token
     string public name = "EZToken" ;
     string public symbol = "EZT";
     uint8 public decimals = 8;
-    // 18 decimals is the strongly suggested default, avoid changing it
-    uint256 public totalSupply = 5000000000000000;
+    uint256 public totalSupply = 0;
+	uint256 public icoSupply = 11500000;
+	uint256 public foundersSupply = 3500000;
+	uint256 public yearlySupply = 3500000;
+	
+	
+	
+	mapping (address => uint) public freezedAccounts;
 
+	
+	uint founderFronzenUntil = 1530403200;  //2018-07-01
+	uint year1FronzenUntil = 1546300800; //2019-01-01
+	uint year2FronzenUntil = 1577836800; //2020-01-01
+	uint year3FronzenUntil = 1609459200; //2021-01-01
+	uint year4FronzenUntil = 1640995200; //2022-01-01
+	uint year5FronzenUntil = 1672531200; //2023-01-01
+	uint year6FronzenUntil = 1704067200; //2024-01-01
+	uint year7FronzenUntil = 1735689600; //2025-01-01
+	uint year8FronzenUntil = 1767225600; //2026-01-01
+	uint year9FronzenUntil = 1798761600; //2027-01-01
+	uint year10FronzenUntil = 1830297600; //2028-01-01
+	
     // This creates an array with all balances
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
@@ -23,13 +43,61 @@ contract EZToken {
     event Burn(address indexed from, uint256 value);
 
     /**
-     * Constrctor function
+     * Constructor function
      *
      * Initializes contract with initial supply tokens to the creator of the contract
      */
-    function EZToken() public {
-        balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
+    function EZToken(address _founderAddress, address _year1, address _year2, address _year3, address _year4, address _year5, address _year6, address _year7, address _year8, address _year9, address _year10 ) public {
+		
+        balanceOf[msg.sender] = icoSupply * 10 ** uint256(decimals);                 
+		totalSupply = icoSupply * 10 ** uint256(decimals);
+		
+		
+		freezedAccounts[_founderAddress] = founderFronzenUntil;
+		balanceOf[_founderAddress] = foundersSupply * 10 ** uint256(decimals);
+		totalSupply += foundersSupply * 10 ** uint256(decimals);
+		
+		freezedAccounts[_year1] = year1FronzenUntil;
+		balanceOf[_year1] = yearlySupply * 10 ** uint256(decimals);
+		totalSupply += yearlySupply * 10 ** uint256(decimals);
+		
+		freezedAccounts[_year2] = year2FronzenUntil;
+		balanceOf[_year2] = yearlySupply * 10 ** uint256(decimals);
+		totalSupply += yearlySupply * 10 ** uint256(decimals);
+		
+		freezedAccounts[_year3] = year3FronzenUntil;
+		balanceOf[_year3] = yearlySupply * 10 ** uint256(decimals);
+		totalSupply += yearlySupply * 10 ** uint256(decimals);
+		
+		freezedAccounts[_year4] = year4FronzenUntil;
+		balanceOf[_year4] = yearlySupply * 10 ** uint256(decimals);
+		totalSupply += yearlySupply * 10 ** uint256(decimals);
+		
+		freezedAccounts[_year5] = year5FronzenUntil;
+		balanceOf[_year5] = yearlySupply * 10 ** uint256(decimals);
+		totalSupply += yearlySupply * 10 ** uint256(decimals);
+		
+		freezedAccounts[_year6] = year6FronzenUntil;
+		balanceOf[_year6] = yearlySupply * 10 ** uint256(decimals);
+		totalSupply += yearlySupply * 10 ** uint256(decimals);
+		
+		freezedAccounts[_year7] = year7FronzenUntil;
+		balanceOf[_year7] = yearlySupply * 10 ** uint256(decimals);
+		totalSupply += yearlySupply * 10 ** uint256(decimals);
+		
+		freezedAccounts[_year8] = year8FronzenUntil;
+		balanceOf[_year8] = yearlySupply * 10 ** uint256(decimals);
+		totalSupply += yearlySupply * 10 ** uint256(decimals);
+		
+		freezedAccounts[_year9] = year9FronzenUntil;
+		balanceOf[_year9] = yearlySupply * 10 ** uint256(decimals);
+		totalSupply += yearlySupply * 10 ** uint256(decimals);
+		
+		freezedAccounts[_year10] = year10FronzenUntil;
+		balanceOf[_year10] = yearlySupply * 10 ** uint256(decimals);
+		totalSupply += yearlySupply * 10 ** uint256(decimals);
     }
+	
 	
 	
     /**
@@ -38,6 +106,8 @@ contract EZToken {
     function _transfer(address _from, address _to, uint _value) internal {
         // Prevent transfer to 0x0 address. Use burn() instead
         require(_to != 0x0);
+		require(freezedAccounts[_from] == 0 || freezedAccounts[_from] < now);
+		require(freezedAccounts[_to] == 0 || freezedAccounts[_to] < now);
         // Check if the sender has enough
         require(balanceOf[_from] >= _value);
         // Check for overflows
@@ -52,6 +122,7 @@ contract EZToken {
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
+	
 
     /**
      * Transfer tokens
