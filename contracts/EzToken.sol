@@ -32,7 +32,7 @@ contract EZToken {
 	
     // This creates an array with all balances
     mapping (address => uint256) public balances;
-    mapping (address => mapping (address => uint256)) public allowance;
+    mapping (address => mapping (address => uint256)) public allowed;
 
 	bool public transfersEnabled = true;
 
@@ -98,11 +98,21 @@ contract EZToken {
         totalSupply += yearlySupply * 10 ** uint256(decimals);
     }
 	
-	// Get the token balance for account `tokenOwner`
+	/**
+     * Get the token balance for account `_owner`
+     */
     function balanceOf(address _owner) public constant returns (uint256 balance) {
         return balances[_owner];
     }
 	
+    /**
+     * Returns the amount of tokens approved by the owner that can be
+     * transferred to the spender's account
+     */
+    function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
+        return allowed[_owner][_spender];
+    }
+
     /**
      * Internal transfer, only can be called by this contract
      */
@@ -149,14 +159,14 @@ contract EZToken {
      * @param _value the amount to send
      */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        require(_value <= allowance[_from][msg.sender]);     // Check allowance
-        allowance[_from][msg.sender] -= _value;
+        require(_value <= allowed[_from][msg.sender]);     // Check allowed
+        allowed[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
         return true;
     }
 
     /**
-     * Set allowance for other address
+     * Set allowed for other address
      *
      * Allows `_spender` to spend no more than `_value` tokens on your behalf
      *
@@ -165,12 +175,12 @@ contract EZToken {
      */
     function approve(address _spender, uint256 _value) public
         returns (bool success) {
-        allowance[msg.sender][_spender] = _value;
+        allowed[msg.sender][_spender] = _value;
         return true;
     }
 
     /**
-     * Set allowance for other address and notify
+     * Set allowed for other address and notify
      *
      * Allows `_spender` to spend no more than `_value` tokens on your behalf, and then ping the contract about it
      *
@@ -213,9 +223,9 @@ contract EZToken {
      */
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
         require(balances[_from] >= _value);                // Check if the targeted balance is enough
-        require(_value <= allowance[_from][msg.sender]);    // Check allowance
+        require(_value <= allowed[_from][msg.sender]);    // Check allowed
         balances[_from] -= _value;                         // Subtract from the targeted balance
-        allowance[_from][msg.sender] -= _value;             // Subtract from the sender's allowance
+        allowed[_from][msg.sender] -= _value;             // Subtract from the sender's allowed
         totalSupply -= _value;                              // Update totalSupply
         Burn(_from, _value);
         return true;
