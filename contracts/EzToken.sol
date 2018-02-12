@@ -89,48 +89,57 @@ contract EZToken {
         balances[msg.sender] = icoSupply * 10 ** uint256(decimals);                 
         Transfer(address(0), msg.sender, icoSupply);
 		
-		
+		require(balances[_founderAddress] == 0);
         freezedAccounts[_founderAddress] = founderFronzenUntil;
         balances[_founderAddress] = foundersSupply * 10 ** uint256(decimals);
         Transfer(address(0), _founderAddress, foundersSupply);
 		
+        require(balances[_year1] == 0);
         freezedAccounts[_year1] = year1FronzenUntil;
         balances[_year1] = yearlySupply * 10 ** uint256(decimals);
         Transfer(address(0), _year1, yearlySupply);
         
-		
+		require(balances[_year2] == 0);
         freezedAccounts[_year2] = year2FronzenUntil;
         balances[_year2] = yearlySupply * 10 ** uint256(decimals);
         Transfer(address(0), _year2, yearlySupply);
 		
+        require(balances[_year3] == 0);
         freezedAccounts[_year3] = year3FronzenUntil;
         balances[_year3] = yearlySupply * 10 ** uint256(decimals);
         Transfer(address(0), _year3, yearlySupply);
 		
+        require(balances[_year4] == 0);
         freezedAccounts[_year4] = year4FronzenUntil;
         balances[_year4] = yearlySupply * 10 ** uint256(decimals);
         Transfer(address(0), _year4, yearlySupply);
 		
+        require(balances[_year5] == 0);
         freezedAccounts[_year5] = year5FronzenUntil;
         balances[_year5] = yearlySupply * 10 ** uint256(decimals);
         Transfer(address(0), _year5, yearlySupply);
 		
+        require(balances[_year6] == 0);
         freezedAccounts[_year6] = year6FronzenUntil;
         balances[_year6] = yearlySupply * 10 ** uint256(decimals);
         Transfer(address(0), _year6, yearlySupply);
 		
+        require(balances[_year7] == 0);
         freezedAccounts[_year7] = year7FronzenUntil;
         balances[_year7] = yearlySupply * 10 ** uint256(decimals);
         Transfer(address(0), _year7, yearlySupply);
 		
+        require(balances[_year8] == 0);
         freezedAccounts[_year8] = year8FronzenUntil;
         balances[_year8] = yearlySupply * 10 ** uint256(decimals);
         Transfer(address(0), _year8, yearlySupply);
 		
+        require(balances[_year9] == 0);
         freezedAccounts[_year9] = year9FronzenUntil;
         balances[_year9] = yearlySupply * 10 ** uint256(decimals);
         Transfer(address(0), _year9, yearlySupply);
 		
+        require(balances[_year10] == 0);
         freezedAccounts[_year10] = year10FronzenUntil;
         balances[_year10] = yearlySupply * 10 ** uint256(decimals);
         Transfer(address(0), _year10, yearlySupply);
@@ -208,35 +217,17 @@ contract EZToken {
     
 
     /**
-     * Destroy tokens
-     *
-     * Remove `_value` tokens from the system irreversibly
-     *
-     * @param _value the amount of money to burn
-     */
-    function burn(uint256 _value) public returns (bool success) {
-        require(balances[msg.sender] >= _value);   // Check if the sender has enough
-        balances[msg.sender] -= _value;            // Subtract from the sender
-        totalSupply -= _value;                      // Updates totalSupply
-        Burn(msg.sender, _value);
-        return true;
-    }
+    * Burns a specific amount of tokens.
+    * @param _value The amount of token to be burned.
+    */
+    function burn(uint256 _value) public {
+        require(_value <= balances[msg.sender]);
+        // no need to require value <= totalSupply, since that would imply the
+        // sender's balance is greater than the totalSupply, which *should* be an assertion failure
 
-    /**
-     * Destroy tokens from other account
-     *
-     * Remove `_value` tokens from the system irreversibly on behalf of `_from`.
-     *
-     * @param _from the address of the sender
-     * @param _value the amount of money to burn
-     */
-    function burnFrom(address _from, uint256 _value) public returns (bool success) {
-        require(balances[_from] >= _value);                // Check if the targeted balance is enough
-        require(_value <= allowed[_from][msg.sender]);    // Check allowed
-        balances[_from] -= _value;                         // Subtract from the targeted balance
-        allowed[_from][msg.sender] -= _value;             // Subtract from the sender's allowed
-        totalSupply -= _value;                              // Update totalSupply
-        Burn(_from, _value);
-        return true;
+        address burner = msg.sender;
+        balances[burner] = balances[burner].sub(_value);
+        totalSupply_ = totalSupply_.sub(_value);
+        Burn(burner, _value);
     }
 }
