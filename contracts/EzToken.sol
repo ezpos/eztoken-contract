@@ -2,8 +2,42 @@ pragma solidity ^0.4.2;
 
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 
+/**
+ * @title SafeMath
+ * @dev Math operations with safety checks that throw on error
+ */
+library SafeMath {
+  function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+    if (a == 0) {
+      return 0;
+    }
+    uint256 c = a * b;
+    assert(c / a == b);
+    return c;
+  }
+
+  function div(uint256 a, uint256 b) internal pure returns (uint256) {
+    // assert(b > 0); // Solidity automatically throws when dividing by 0
+    uint256 c = a / b;
+    // assert(a == b * c + a % b); // There is no case in which this doesn't hold
+    return c;
+  }
+
+  function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+    assert(b <= a);
+    return a - b;
+  }
+
+  function add(uint256 a, uint256 b) internal pure returns (uint256) {
+    uint256 c = a + b;
+    assert(c >= a);
+    return c;
+  }
+}
 
 contract EZToken {
+    using SafeMath for uint256;
+
     // Public variables of the token
     string public name = "EZToken" ;
     string public symbol = "EZT";
@@ -31,8 +65,8 @@ contract EZToken {
     uint year10FronzenUntil = 1830297600; //2028-01-01
 	
     // This creates an array with all balances
-    mapping (address => uint256) public balances;
-    mapping (address => mapping (address => uint256)) public allowed;
+    mapping (address => uint256) internal balances;
+    mapping (address => mapping (address => uint256)) internal allowed;
 
 	bool public transfersEnabled = true;
 
@@ -114,56 +148,43 @@ contract EZToken {
     }
 
     /**
-     * Internal transfer, only can be called by this contract
+     * Transfer token for a specified address
+     * @param _to The address to transfer to.
+     * @param _value The amount to be transferred.
      */
-    function _transfer(address _from, address _to, uint _value) internal {
-        // Prevent transfer to 0x0 address. Use burn() instead
-        require(_to != 0x0);
-        require(freezedAccounts[_from] == 0 || freezedAccounts[_from] < now);
+    function transfer(address _to, uint256 _value) public returns (bool) {
+        require(_to != address(0));
+        require(_value <= balances[msg.sender]);
+        require(freezedAccounts[msg.sender] == 0 || freezedAccounts[msg.sender] < now);
         require(freezedAccounts[_to] == 0 || freezedAccounts[_to] < now);
-        // Check if the sender has enough
-        require(balances[_from] >= _value);
-        // Check for overflows
-        require(balances[_to] + _value > balances[_to]);
-        // Save this for an assertion in the future
-        uint previousBalances = balances[_from] + balances[_to];
-        // Subtract from the sender
-        balances[_from] -= _value;
-        // Add the same to the recipient
-        balances[_to] += _value;
-        Transfer(_from, _to, _value);
-        // Asserts are used to use static analysis to find bugs in your code. They should never fail
-        assert(balances[_from] + balances[_to] == previousBalances);
-    }
-	
 
-    /**
-     * Transfer tokens
-     *
-     * Send `_value` tokens to `_to` from your account
-     *
-     * @param _to The address of the recipient
-     * @param _value the amount to send
-     */
-    function transfer(address _to, uint256 _value) public {
-        _transfer(msg.sender, _to, _value);
-    }
-
-    /**
-     * Transfer tokens from other address
-     *
-     * Send `_value` tokens to `_to` on behalf of `_from`
-     *
-     * @param _from The address of the sender
-     * @param _to The address of the recipient
-     * @param _value the amount to send
-     */
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        require(_value <= allowed[_from][msg.sender]);     // Check allowed
-        allowed[_from][msg.sender] -= _value;
-        _transfer(_from, _to, _value);
+        balances[msg.sender] = balances[msg.sender].sub(_value);
+        balances[_to] = balances[_to].add(_value);
+        Transfer(msg.sender, _to, _value);
         return true;
     }
+
+    /**
+     * Transfer tokens from one address to another
+     * @param _from address The address which you want to send tokens from
+     * @param _to address The address which you want to transfer to
+     * @param _value uint256 the amount of tokens to be transferred
+     */
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
+        require(_to != address(0));
+        require(_value <= balances[_from]);
+        require(_value <= allowed[_from][msg.sender]);
+        require(freezedAccounts[_from] == 0 || freezedAccounts[_from] < now);
+        require(freezedAccounts[_to] == 0 || freezedAccounts[_to] < now);
+
+        balances[_from] = balances[_from].sub(_value);
+        balances[_to] = balances[_to].add(_value);
+        allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
+        Transfer(_from, _to, _value);
+        return true;
+    }
+
+    
 
     /**
      * Set allowed for other address
