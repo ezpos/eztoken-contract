@@ -43,26 +43,26 @@ contract EZToken {
     string public symbol = "EZT";
     uint8 public decimals = 8;
     uint256 totalSupply_ = 0;
-    uint256 public icoSupply = 11500000;
-    uint256 public foundersSupply = 3500000;
-    uint256 public yearlySupply = 3500000;
+    uint256 constant icoSupply = 11500000;
+    uint256 constant foundersSupply = 3500000;
+    uint256 constant yearlySupply = 3500000;
     
     
     
     mapping (address => uint) public freezedAccounts;
 
     
-    uint founderFronzenUntil = 1530403200;  //2018-07-01
-    uint year1FronzenUntil = 1546300800; //2019-01-01
-    uint year2FronzenUntil = 1577836800; //2020-01-01
-    uint year3FronzenUntil = 1609459200; //2021-01-01
-    uint year4FronzenUntil = 1640995200; //2022-01-01
-    uint year5FronzenUntil = 1672531200; //2023-01-01
-    uint year6FronzenUntil = 1704067200; //2024-01-01
-    uint year7FronzenUntil = 1735689600; //2025-01-01
-    uint year8FronzenUntil = 1767225600; //2026-01-01
-    uint year9FronzenUntil = 1798761600; //2027-01-01
-    uint year10FronzenUntil = 1830297600; //2028-01-01
+    uint constant founderFronzenUntil = 1530403200;  //2018-07-01
+    uint constant year1FronzenUntil = 1546300800; //2019-01-01
+    uint constant year2FronzenUntil = 1577836800; //2020-01-01
+    uint constant year3FronzenUntil = 1609459200; //2021-01-01
+    uint constant year4FronzenUntil = 1640995200; //2022-01-01
+    uint constant year5FronzenUntil = 1672531200; //2023-01-01
+    uint constant year6FronzenUntil = 1704067200; //2024-01-01
+    uint constant year7FronzenUntil = 1735689600; //2025-01-01
+    uint constant year8FronzenUntil = 1767225600; //2026-01-01
+    uint constant year9FronzenUntil = 1798761600; //2027-01-01
+    uint constant year10FronzenUntil = 1830297600; //2028-01-01
     
     // This creates an array with all balances
     mapping (address => uint256) internal balances;
