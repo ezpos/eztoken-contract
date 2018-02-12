@@ -84,54 +84,56 @@ contract EZToken {
      * Initializes contract with initial supply tokens to the creator of the contract
      */
     function EZToken(address _founderAddress, address _year1, address _year2, address _year3, address _year4, address _year5, address _year6, address _year7, address _year8, address _year9, address _year10 ) public {
-		
+		totalSupply = 50000000 * 10 ** uint256(decimals)
+        
         balances[msg.sender] = icoSupply * 10 ** uint256(decimals);                 
-        totalSupply = icoSupply * 10 ** uint256(decimals);
+        Transfer(address(0), msg.sender, icoSupply);
 		
 		
         freezedAccounts[_founderAddress] = founderFronzenUntil;
         balances[_founderAddress] = foundersSupply * 10 ** uint256(decimals);
-        totalSupply += foundersSupply * 10 ** uint256(decimals);
+        Transfer(address(0), _founderAddress, foundersSupply);
 		
         freezedAccounts[_year1] = year1FronzenUntil;
         balances[_year1] = yearlySupply * 10 ** uint256(decimals);
-        totalSupply += yearlySupply * 10 ** uint256(decimals);
+        Transfer(address(0), _year1, yearlySupply);
+        
 		
         freezedAccounts[_year2] = year2FronzenUntil;
         balances[_year2] = yearlySupply * 10 ** uint256(decimals);
-        totalSupply += yearlySupply * 10 ** uint256(decimals);
+        Transfer(address(0), _year2, yearlySupply);
 		
         freezedAccounts[_year3] = year3FronzenUntil;
         balances[_year3] = yearlySupply * 10 ** uint256(decimals);
-        totalSupply += yearlySupply * 10 ** uint256(decimals);
+        Transfer(address(0), _year3, yearlySupply);
 		
         freezedAccounts[_year4] = year4FronzenUntil;
         balances[_year4] = yearlySupply * 10 ** uint256(decimals);
-        totalSupply += yearlySupply * 10 ** uint256(decimals);
+        Transfer(address(0), _year4, yearlySupply);
 		
         freezedAccounts[_year5] = year5FronzenUntil;
         balances[_year5] = yearlySupply * 10 ** uint256(decimals);
-        totalSupply += yearlySupply * 10 ** uint256(decimals);
+        Transfer(address(0), _year5, yearlySupply);
 		
         freezedAccounts[_year6] = year6FronzenUntil;
         balances[_year6] = yearlySupply * 10 ** uint256(decimals);
-        totalSupply += yearlySupply * 10 ** uint256(decimals);
+        Transfer(address(0), _year6, yearlySupply);
 		
         freezedAccounts[_year7] = year7FronzenUntil;
         balances[_year7] = yearlySupply * 10 ** uint256(decimals);
-        totalSupply += yearlySupply * 10 ** uint256(decimals);
+        Transfer(address(0), _year7, yearlySupply);
 		
         freezedAccounts[_year8] = year8FronzenUntil;
         balances[_year8] = yearlySupply * 10 ** uint256(decimals);
-        totalSupply += yearlySupply * 10 ** uint256(decimals);
+        Transfer(address(0), _year8, yearlySupply);
 		
         freezedAccounts[_year9] = year9FronzenUntil;
         balances[_year9] = yearlySupply * 10 ** uint256(decimals);
-        totalSupply += yearlySupply * 10 ** uint256(decimals);
+        Transfer(address(0), _year9, yearlySupply);
 		
         freezedAccounts[_year10] = year10FronzenUntil;
         balances[_year10] = yearlySupply * 10 ** uint256(decimals);
-        totalSupply += yearlySupply * 10 ** uint256(decimals);
+        Transfer(address(0), _year10, yearlySupply);
     }
 	
 	/**
