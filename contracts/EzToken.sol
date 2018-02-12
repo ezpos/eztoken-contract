@@ -76,6 +76,8 @@ contract EZToken {
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
 
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+
     /**
      * Constructor function
      *
@@ -197,6 +199,7 @@ contract EZToken {
     function approve(address _spender, uint256 _value) public
         returns (bool success) {
         allowed[msg.sender][_spender] = _value;
+        Approval(msg.sender, _spender, _value);
         return true;
     }
 
