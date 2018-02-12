@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity ^0.4.18;
 
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 
@@ -42,16 +42,16 @@ contract EZToken {
     string public name = "EZToken" ;
     string public symbol = "EZT";
     uint8 public decimals = 8;
-    uint256 public totalSupply = 0;
+    uint256 totalSupply_ = 0;
     uint256 public icoSupply = 11500000;
     uint256 public foundersSupply = 3500000;
     uint256 public yearlySupply = 3500000;
-	
-	
-	
+    
+    
+    
     mapping (address => uint) public freezedAccounts;
 
-	
+    
     uint founderFronzenUntil = 1530403200;  //2018-07-01
     uint year1FronzenUntil = 1546300800; //2019-01-01
     uint year2FronzenUntil = 1577836800; //2020-01-01
@@ -63,7 +63,7 @@ contract EZToken {
     uint year8FronzenUntil = 1767225600; //2026-01-01
     uint year9FronzenUntil = 1798761600; //2027-01-01
     uint year10FronzenUntil = 1830297600; //2028-01-01
-	
+    
     // This creates an array with all balances
     mapping (address => uint256) internal balances;
     mapping (address => mapping (address => uint256)) internal allowed;
@@ -83,11 +83,11 @@ contract EZToken {
      * Initializes contract with initial supply tokens to the creator of the contract
      */
     function EZToken(address _founderAddress, address _year1, address _year2, address _year3, address _year4, address _year5, address _year6, address _year7, address _year8, address _year9, address _year10 ) public {
-		totalSupply = 50000000 * 10 ** uint256(decimals)
+        totalSupply_ = 50000000 * 10 ** uint256(decimals);
         
         balances[msg.sender] = icoSupply * 10 ** uint256(decimals);                 
         Transfer(address(0), msg.sender, icoSupply);
-		
+        
         _setFreezedBalance(_founderAddress, foundersSupply, founderFronzenUntil);
 
         _setFreezedBalance(_year1, yearlySupply, year1FronzenUntil);
@@ -101,23 +101,31 @@ contract EZToken {
         _setFreezedBalance(_year9, yearlySupply, year9FronzenUntil);
         _setFreezedBalance(_year10, yearlySupply, year10FronzenUntil);
     }
-	
+    
+    /**
+    * Total number of tokens in existence
+    */
+    function totalSupply() public view returns (uint256) {
+        return totalSupply_;
+    }
+
     /**
      * Set balance and freeze time for address
      */
     function _setFreezedBalance(address _owner, uint256 _amount, uint _lockedUntil) internal {
+        require(_owner != address(0));
         require(balances[_owner] == 0);
         freezedAccounts[_owner] = _lockedUntil;
-        balances[_year8] = _amount * 10 ** uint256(decimals);     
+        balances[_owner] = _amount * 10 ** uint256(decimals);     
     }
 
-	/**
+    /**
      * Get the token balance for account `_owner`
      */
     function balanceOf(address _owner) public constant returns (uint256 balance) {
         return balances[_owner];
     }
-	
+    
     /**
      * Returns the amount of tokens approved by the owner that can be
      * transferred to the spender's account
