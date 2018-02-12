@@ -31,7 +31,7 @@ contract EZToken {
     uint year10FronzenUntil = 1830297600; //2028-01-01
 	
     // This creates an array with all balances
-    mapping (address => uint256) public balanceOf;
+    mapping (address => uint256) public balances;
     mapping (address => mapping (address => uint256)) public allowance;
 
 	bool public transfersEnabled = true;
@@ -49,56 +49,59 @@ contract EZToken {
      */
     function EZToken(address _founderAddress, address _year1, address _year2, address _year3, address _year4, address _year5, address _year6, address _year7, address _year8, address _year9, address _year10 ) public {
 		
-        balanceOf[msg.sender] = icoSupply * 10 ** uint256(decimals);                 
+        balances[msg.sender] = icoSupply * 10 ** uint256(decimals);                 
         totalSupply = icoSupply * 10 ** uint256(decimals);
 		
 		
         freezedAccounts[_founderAddress] = founderFronzenUntil;
-        balanceOf[_founderAddress] = foundersSupply * 10 ** uint256(decimals);
+        balances[_founderAddress] = foundersSupply * 10 ** uint256(decimals);
         totalSupply += foundersSupply * 10 ** uint256(decimals);
 		
         freezedAccounts[_year1] = year1FronzenUntil;
-        balanceOf[_year1] = yearlySupply * 10 ** uint256(decimals);
+        balances[_year1] = yearlySupply * 10 ** uint256(decimals);
         totalSupply += yearlySupply * 10 ** uint256(decimals);
 		
         freezedAccounts[_year2] = year2FronzenUntil;
-        balanceOf[_year2] = yearlySupply * 10 ** uint256(decimals);
+        balances[_year2] = yearlySupply * 10 ** uint256(decimals);
         totalSupply += yearlySupply * 10 ** uint256(decimals);
 		
         freezedAccounts[_year3] = year3FronzenUntil;
-        balanceOf[_year3] = yearlySupply * 10 ** uint256(decimals);
+        balances[_year3] = yearlySupply * 10 ** uint256(decimals);
         totalSupply += yearlySupply * 10 ** uint256(decimals);
 		
         freezedAccounts[_year4] = year4FronzenUntil;
-        balanceOf[_year4] = yearlySupply * 10 ** uint256(decimals);
+        balances[_year4] = yearlySupply * 10 ** uint256(decimals);
         totalSupply += yearlySupply * 10 ** uint256(decimals);
 		
         freezedAccounts[_year5] = year5FronzenUntil;
-        balanceOf[_year5] = yearlySupply * 10 ** uint256(decimals);
+        balances[_year5] = yearlySupply * 10 ** uint256(decimals);
         totalSupply += yearlySupply * 10 ** uint256(decimals);
 		
         freezedAccounts[_year6] = year6FronzenUntil;
-        balanceOf[_year6] = yearlySupply * 10 ** uint256(decimals);
+        balances[_year6] = yearlySupply * 10 ** uint256(decimals);
         totalSupply += yearlySupply * 10 ** uint256(decimals);
 		
         freezedAccounts[_year7] = year7FronzenUntil;
-        balanceOf[_year7] = yearlySupply * 10 ** uint256(decimals);
+        balances[_year7] = yearlySupply * 10 ** uint256(decimals);
         totalSupply += yearlySupply * 10 ** uint256(decimals);
 		
         freezedAccounts[_year8] = year8FronzenUntil;
-        balanceOf[_year8] = yearlySupply * 10 ** uint256(decimals);
+        balances[_year8] = yearlySupply * 10 ** uint256(decimals);
         totalSupply += yearlySupply * 10 ** uint256(decimals);
 		
         freezedAccounts[_year9] = year9FronzenUntil;
-        balanceOf[_year9] = yearlySupply * 10 ** uint256(decimals);
+        balances[_year9] = yearlySupply * 10 ** uint256(decimals);
         totalSupply += yearlySupply * 10 ** uint256(decimals);
 		
         freezedAccounts[_year10] = year10FronzenUntil;
-        balanceOf[_year10] = yearlySupply * 10 ** uint256(decimals);
+        balances[_year10] = yearlySupply * 10 ** uint256(decimals);
         totalSupply += yearlySupply * 10 ** uint256(decimals);
     }
 	
-	
+	// Get the token balance for account `tokenOwner`
+    function balanceOf(address _owner) public constant returns (uint256 balance) {
+        return balances[_owner];
+    }
 	
     /**
      * Internal transfer, only can be called by this contract
@@ -109,18 +112,18 @@ contract EZToken {
         require(freezedAccounts[_from] == 0 || freezedAccounts[_from] < now);
         require(freezedAccounts[_to] == 0 || freezedAccounts[_to] < now);
         // Check if the sender has enough
-        require(balanceOf[_from] >= _value);
+        require(balances[_from] >= _value);
         // Check for overflows
-        require(balanceOf[_to] + _value > balanceOf[_to]);
+        require(balances[_to] + _value > balances[_to]);
         // Save this for an assertion in the future
-        uint previousBalances = balanceOf[_from] + balanceOf[_to];
+        uint previousBalances = balances[_from] + balances[_to];
         // Subtract from the sender
-        balanceOf[_from] -= _value;
+        balances[_from] -= _value;
         // Add the same to the recipient
-        balanceOf[_to] += _value;
+        balances[_to] += _value;
         Transfer(_from, _to, _value);
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
-        assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
+        assert(balances[_from] + balances[_to] == previousBalances);
     }
 	
 
@@ -193,8 +196,8 @@ contract EZToken {
      * @param _value the amount of money to burn
      */
     function burn(uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);   // Check if the sender has enough
-        balanceOf[msg.sender] -= _value;            // Subtract from the sender
+        require(balances[msg.sender] >= _value);   // Check if the sender has enough
+        balances[msg.sender] -= _value;            // Subtract from the sender
         totalSupply -= _value;                      // Updates totalSupply
         Burn(msg.sender, _value);
         return true;
@@ -209,9 +212,9 @@ contract EZToken {
      * @param _value the amount of money to burn
      */
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
-        require(balanceOf[_from] >= _value);                // Check if the targeted balance is enough
+        require(balances[_from] >= _value);                // Check if the targeted balance is enough
         require(_value <= allowance[_from][msg.sender]);    // Check allowance
-        balanceOf[_from] -= _value;                         // Subtract from the targeted balance
+        balances[_from] -= _value;                         // Subtract from the targeted balance
         allowance[_from][msg.sender] -= _value;             // Subtract from the sender's allowance
         totalSupply -= _value;                              // Update totalSupply
         Burn(_from, _value);
